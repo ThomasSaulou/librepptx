@@ -219,6 +219,7 @@ export default {
       if (showTextDialog.value) return;
       
       selectedElementId.value = null;
+      
       setTimeout(() => {
         if (transformer.value) {
           try {
@@ -473,15 +474,15 @@ export default {
             }
             
             // Gestion de la touche Supprimer
-            // if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElementId.value && !showTextDialog.value) {
-            //   // Empêcher la suppression du contenu de la page si un input a le focus
-            //   if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') {
-            //     return;
-            //   }
+            if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElementId.value && !showTextDialog.value) {
+              // Empêcher la suppression du contenu de la page si un input a le focus
+              if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') {
+                return;
+              }
               
-            //   e.preventDefault();
-            //   deleteSelectedElement();
-            // }
+              e.preventDefault();
+              deleteSelectedElement();
+            }
           });
         }
       }, 100);

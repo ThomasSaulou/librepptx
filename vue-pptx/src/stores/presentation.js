@@ -238,6 +238,21 @@ export const usePresentationStore = defineStore('presentation', {
       } finally {
         this.isLoading = false
       }
+    },
+    
+    // Supprime un élément de la diapositive actuelle
+    deleteElement(elementId) {
+      const slide = this.presentation.slides[this.currentSlideIndex]
+      if (!slide) return false
+      
+      const elementIndex = slide.elements.findIndex(el => el.id === elementId)
+      if (elementIndex !== -1) {
+        // Supprimer l'élément du tableau
+        slide.elements.splice(elementIndex, 1)
+        return true
+      }
+      
+      return false
     }
   }
 }) 
