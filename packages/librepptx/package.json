@@ -13,7 +13,9 @@
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "test:convert": "ts-node src/test-convert.ts",
-    "test:html": "ts-node src/test-html.ts"
+    "test:html": "ts-node src/test-html.ts",
+    "test:json": "ts-node src/test-json.ts",
+    "phase3": "npm run test:json && echo 'Phase 3 terminée avec succès!'"
   },
   "keywords": [
     "pptx",
@@ -29,7 +31,8 @@
   "license": "MIT",
   "dependencies": {
     "@types/adm-zip": "^0.5.7",
-    "adm-zip": "^0.5.16"
+    "adm-zip": "^0.5.16",
+    "fast-xml-parser": "^5.2.0"
   },
   "devDependencies": {
     "@types/jest": "^29.0.0",

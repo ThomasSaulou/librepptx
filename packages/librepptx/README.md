@@ -19,13 +19,20 @@ npm install librepptx
 - Conversion de fichiers PPTX vers PDF
 - Conversion de fichiers PPTX vers FODP (Format OpenDocument Flat)
 - Conversion de fichiers FODP vers PPTX
+- Conversion de fichiers PPTX vers JSON (structure éditable)
 - Gestion d'erreurs avancée
 - Options de configuration flexibles
 
 ## Utilisation de base
 
 ```javascript
-const { convertPptxToHtml, convertPptxToPdf, convertPptxToFodp, convertFodpToPptx } = require('librepptx');
+const { 
+  convertPptxToHtml, 
+  convertPptxToPdf, 
+  convertPptxToFodp, 
+  convertFodpToPptx,
+  convertPptxToJson
+} = require('librepptx');
 
 // Conversion PPTX vers HTML (avec ressources zippées)
 try {
@@ -33,6 +40,18 @@ try {
   console.log('Fichier HTML zippé créé:', htmlZipPath);
 } catch (error) {
   console.error('Erreur de conversion:', error.message);
+}
+
+// Conversion PPTX vers une structure JSON
+try {
+  const jsonResult = await convertPptxToJson('/chemin/vers/presentation.pptx', {
+    outputDir: '/chemin/sortie',
+    verbose: true
+  });
+  console.log('Titre de la présentation:', jsonResult.title);
+  console.log('Nombre de diapositives:', jsonResult.slides.length);
+} catch (error) {
+  console.error('Erreur de conversion JSON:', error.message);
 }
 
 // Conversion PPTX vers PDF
@@ -82,6 +101,21 @@ Convertit un fichier FODP en PPTX.
 - **inputPath**: Chemin du fichier FODP d'entrée
 - **options**: Options de conversion
 - **Retourne**: Objet `ConversionResult` contenant le chemin du fichier PPTX généré
+
+#### `convertPptxToJson(inputPath, options)`
+
+Convertit un fichier PPTX en structure JSON éditable.
+
+- **inputPath**: Chemin du fichier PPTX d'entrée
+- **options**: Options de conversion
+- **Retourne**: Objet `Presentation` contenant la structure complète de la présentation
+
+#### `convertFodpToJson(fodpPath)`
+
+Convertit un fichier FODP en structure JSON éditable.
+
+- **fodpPath**: Chemin du fichier FODP d'entrée
+- **Retourne**: Objet `Presentation` contenant la structure complète de la présentation
 
 ### Options de conversion
 

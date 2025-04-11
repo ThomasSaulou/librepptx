@@ -44,6 +44,16 @@ import {
   logError,
   logDebug
 } from './utils';
+import {
+  convertPptxToJson,
+  convertFodpToJson,
+  Presentation,
+  Slide,
+  SlideElement,
+  TextElement,
+  ImageElement,
+  ShapeElement
+} from './converter';
 
 // Exports pour utilisation publique
 export * from './types';
@@ -53,6 +63,16 @@ export {
   getLogLevel, 
   checkLibreOfficeInstallation 
 } from './utils';
+export {
+  convertPptxToJson,
+  convertFodpToJson,
+  Presentation,
+  Slide,
+  SlideElement,
+  TextElement,
+  ImageElement,
+  ShapeElement
+} from './converter';
 
 /**
  * Convertit un fichier PPTX en HTML avec options avancées
