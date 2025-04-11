@@ -3,7 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "prepare": "npm run build",
+    "start": "ts-node src/index.ts",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean",
+    "test:convert": "ts-node src/test-convert.ts",
+    "test:html": "ts-node src/test-html.ts",
+    "test:json": "ts-node src/test-json.ts"
   },
   "keywords": [],
   "author": "",
