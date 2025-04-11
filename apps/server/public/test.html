@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test LibrePPTX</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .upload-form {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: none;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+        .file-input-container {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test de conversion PPTX vers HTML</h1>
+    
+    <div class="upload-form">
+        <form id="uploadForm">
+            <div class="file-input-container">
+                <label for="pptxFile">Sélectionnez un fichier PowerPoint (.pptx):</label>
+                <input type="file" id="pptxFile" name="file" accept=".pptx" required title="Sélectionnez un fichier PowerPoint">
+            </div>
+            <button type="submit">Convertir</button>
+        </form>
+    </div>
+
+    <div id="error" class="error"></div>
+    <div id="result" class="result">
+        <h3>Résultat :</h3>
+        <p>Le fichier a été converti avec succès !</p>
+        <a id="downloadLink" href="#" download>Télécharger le fichier ZIP</a>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const errorDiv = document.getElementById('error');
+            const resultDiv = document.getElementById('result');
+            const downloadLink = document.getElementById('downloadLink');
+            
+            try {
+                const response = await fetch('http://localhost:3000/convert/pptx-to-html', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+
+                // Récupérer le blob de la réponse
+                const blob = await response.blob();
+                
+                // Créer l'URL du blob
+                const url = window.URL.createObjectURL(blob);
+                
+                // Mettre à jour le lien de téléchargement
+                downloadLink.href = url;
+                downloadLink.download = 'converted.zip';
+                
+                // Afficher le résultat
+                errorDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                errorDiv.textContent = `Erreur: ${error.message}`;
+                errorDiv.style.display = 'block';
+                resultDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 
