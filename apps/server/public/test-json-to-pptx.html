@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test de conversion JSON vers PPTX</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      padding: 10px;
+      box-sizing: border-box;
+      font-family: monospace;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      display: none;
+    }
+    .error {
+      color: #ff0000;
+      font-weight: bold;
+    }
+    .success {
+      color: #008000;
+      font-weight: bold;
+    }
+    .sample-button {
+      background-color: #2196F3;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test de conversion JSON vers PPTX</h1>
+  
+  <button id="loadSample" class="sample-button">Charger un exemple de JSON</button>
+  
+  <div class="form-group">
+    <label for="jsonInput">JSON de la présentation :</label>
+    <textarea id="jsonInput" placeholder="Collez ici votre JSON..."></textarea>
+  </div>
+  
+  <button id="convertButton">Convertir en PPTX</button>
+  
+  <div id="result"></div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loadSampleButton = document.getElementById('loadSample');
+      const jsonInput = document.getElementById('jsonInput');
+      const convertButton = document.getElementById('convertButton');
+      const resultDiv = document.getElementById('result');
+      
+      // Exemple de JSON de présentation
+      const sampleJson = {
+        presentation: {
+          title: "Présentation de test",
+          slides: [
+            {
+              id: "slide-1",
+              title: "Première diapositive",
+              elements: [
+                {
+                  type: "text",
+                  id: "text-1",
+                  text: "Titre de la présentation",
+                  position: {
+                    x: 100,
+                    y: 50,
+                    width: 400,
+                    height: 50
+                  },
+                  style: {
+                    fontFamily: "Arial",
+                    fontSize: 24,
+                    color: "#333333",
+                    bold: true
+                  }
+                },
+                {
+                  type: "text",
+                  id: "text-2",
+                  text: "Ce texte a été généré par l'API JSON vers PPTX",
+                  position: {
+                    x: 100,
+                    y: 120,
+                    width: 400,
+                    height: 40
+                  },
+                  style: {
+                    fontFamily: "Arial",
+                    fontSize: 16,
+                    color: "#666666"
+                  }
+                },
+                {
+                  type: "shape",
+                  id: "shape-1",
+                  shapeType: "rectangle",
+                  position: {
+                    x: 100,
+                    y: 200,
+                    width: 150,
+                    height: 100
+                  },
+                  style: {
+                    fill: "#E6F7FF",
+                    stroke: "#1890FF",
+                    strokeWidth: 2
+                  }
+                }
+              ],
+              background: {
+                color: "#FFFFFF"
+              }
+            },
+            {
+              id: "slide-2",
+              title: "Deuxième diapositive",
+              elements: [
+                {
+                  type: "text",
+                  id: "text-3",
+                  text: "Deuxième diapositive",
+                  position: {
+                    x: 100,
+                    y: 50,
+                    width: 400,
+                    height: 50
+                  },
+                  style: {
+                    fontFamily: "Arial",
+                    fontSize: 24,
+                    color: "#333333",
+                    bold: true
+                  }
+                },
+                {
+                  type: "shape",
+                  id: "shape-2",
+                  shapeType: "ellipse",
+                  position: {
+                    x: 250,
+                    y: 150,
+                    width: 100,
+                    height: 100
+                  },
+                  style: {
+                    fill: "#FFCCC7",
+                    stroke: "#FF4D4F",
+                    strokeWidth: 2
+                  }
+                }
+              ],
+              background: {
+                color: "#F5F5F5"
+              }
+            }
+          ],
+          metadata: {
+            author: "Utilisateur Test",
+            created: new Date().toISOString()
+          }
+        }
+      };
+      
+      // Charger l'exemple de JSON
+      loadSampleButton.addEventListener('click', function() {
+        jsonInput.value = JSON.stringify(sampleJson, null, 2);
+      });
+      
+      // Convertir le JSON en PPTX
+      convertButton.addEventListener('click', function() {
+        const jsonData = jsonInput.value.trim();
+        
+        if (!jsonData) {
+          showResult('Veuillez entrer des données JSON valides', 'error');
+          return;
+        }
+        
+        let parsedJson;
+        try {
+          parsedJson = JSON.parse(jsonData);
+        } catch (error) {
+          showResult('JSON invalide: ' + error.message, 'error');
+          return;
+        }
+        
+        showResult('Conversion en cours...', 'pending');
+        
+        fetch('/export/json-to-pptx', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: jsonData
+        })
+        .then(response => {
+          if (!response.ok) {
+            if (response.headers.get('Content-Type')?.includes('application/json')) {
+              return response.json().then(data => {
+                throw new Error(data.error || 'Erreur lors de la conversion');
+              });
+            }
+            throw new Error('Erreur HTTP: ' + response.status);
+          }
+          
+          // C'est un fichier binaire, déclencher le téléchargement
+          return response.blob().then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'presentation.pptx';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+            
+            showResult('Conversion réussie! Téléchargement du fichier PPTX...', 'success');
+          });
+        })
+        .catch(error => {
+          showResult('Erreur: ' + error.message, 'error');
+        });
+      });
+      
+      // Afficher un message de résultat
+      function showResult(message, type) {
+        resultDiv.innerHTML = message;
+        resultDiv.className = type;
+        resultDiv.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html> 

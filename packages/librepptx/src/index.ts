@@ -58,6 +58,7 @@ import {
 // Exports pour utilisation publique
 export * from './types';
 export * from './errors';
+export * from './json-to-pptx';  // Exporter les nouvelles fonctions
 export { 
   setLogLevel, 
   getLogLevel, 

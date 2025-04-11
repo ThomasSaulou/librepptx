@@ -13,6 +13,17 @@ Une bibliothèque Node.js permettant de convertir des fichiers PowerPoint (PPTX)
 npm install librepptx
 ```
 
+## Fonctionnalités
+
+- Conversion de fichiers PPTX en HTML, PDF et FODP (Format OpenDocument Presentation)
+- Conversion de fichiers FODP en PPTX
+- Conversion de fichiers PPTX en JSON (pour édition)
+- Conversion de JSON en PPTX (pour générer des présentations modifiées)
+- Création automatique d'archives ZIP pour les sorties HTML avec toutes les ressources
+- Utilisation de LibreOffice en mode headless pour des conversions rapides
+- API simple et facile à utiliser
+- Possibilité de faire des aller-retours complets : PPTX → JSON → Modification → PPTX
+
 ## Fonctionnalités principales
 
 - Conversion de fichiers PPTX vers HTML (avec ressources zippées)
@@ -116,6 +127,14 @@ Convertit un fichier FODP en structure JSON éditable.
 
 - **fodpPath**: Chemin du fichier FODP d'entrée
 - **Retourne**: Objet `Presentation` contenant la structure complète de la présentation
+
+#### `convertJsonToPptx(presentation, options)`
+
+Convertit une structure JSON en fichier PPTX via FODP.
+
+- **presentation**: Objet JSON représentant la présentation
+- **options**: Options de conversion
+- **Retourne**: Objet `ConversionResult` contenant le chemin du fichier PPTX généré
 
 ### Options de conversion
 
@@ -259,3 +278,181 @@ convertPresentation();
 ## Licence
 
 MIT 
+
+### Conversion de PPTX en JSON (pour édition)
+
+```javascript
+const { convertPptxToJson } = require('librepptx');
+
+async function convertToJson() {
+  try {
+    const jsonData = await convertPptxToJson('presentation.pptx', {
+      outputDir: './output'
+    });
+    
+    console.log('Titre de la présentation:', jsonData.title);
+    console.log('Nombre de diapositives:', jsonData.slides.length);
+    
+    // Sauvegarder le JSON
+    const fs = require('fs');
+    fs.writeFileSync('presentation.json', JSON.stringify(jsonData, null, 2));
+    
+    console.log('Données JSON extraites et sauvegardées');
+  } catch (error) {
+    console.error('Erreur lors de la conversion:', error);
+  }
+}
+
+convertToJson();
+```
+
+### Conversion de JSON en PPTX
+
+```javascript
+const { convertJsonToPptx } = require('librepptx');
+const fs = require('fs');
+
+async function convertJsonToPptxFile() {
+  try {
+    // Charger un fichier JSON existant
+    const jsonData = JSON.parse(fs.readFileSync('presentation.json', 'utf8'));
+    
+    // Convertir en PPTX
+    const result = await convertJsonToPptx(jsonData, {
+      outputDir: './output',
+      outputFileName: 'presentation_modifiee'
+    });
+    
+    console.log(`Présentation PPTX générée: ${result.outputPath}`);
+  } catch (error) {
+    console.error('Erreur lors de la conversion:', error);
+  }
+}
+
+convertJsonToPptxFile();
+```
+
+### Modification du JSON et conversion en PPTX
+
+```javascript
+const { convertPptxToJson, convertJsonToPptx } = require('librepptx');
+
+async function modifyAndConvert() {
+  try {
+    // 1. Convertir PPTX en JSON
+    const jsonData = await convertPptxToJson('presentation.pptx');
+    
+    // 2. Modifier le JSON
+    jsonData.title = 'Présentation modifiée';
+    
+    // Ajouter un élément texte à la première diapositive
+    if (jsonData.slides.length > 0) {
+      jsonData.slides[0].elements.push({
+        type: 'text',
+        id: `text-${Date.now()}`,
+        text: 'Ce texte a été ajouté programmatiquement',
+        position: {
+          x: 100,
+          y: 300,
+          width: 400,
+          height: 50
+        },
+        style: {
+          fontFamily: 'Arial',
+          fontSize: 18,
+          color: '#FF0000',
+          bold: true
+        }
+      });
+    }
+    
+    // 3. Convertir le JSON modifié en PPTX
+    const result = await convertJsonToPptx(jsonData, {
+      outputDir: './output',
+      outputFileName: 'presentation_modifiee'
+    });
+    
+    console.log(`Présentation modifiée et convertie: ${result.outputPath}`);
+  } catch (error) {
+    console.error('Erreur lors de la modification et conversion:', error);
+  }
+}
+
+modifyAndConvert();
+```
+
+## Structure du JSON
+
+Le format JSON pour représenter une présentation suit cette structure:
+
+```javascript
+{
+  "title": "Titre de la présentation",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Première diapositive",
+      "elements": [
+        {
+          "type": "text",
+          "id": "text-1",
+          "text": "Titre de la diapositive",
+          "position": {
+            "x": 100,
+            "y": 50,
+            "width": 400,
+            "height": 50
+          },
+          "style": {
+            "fontFamily": "Arial",
+            "fontSize": 24,
+            "color": "#333333",
+            "bold": true,
+            "italic": false,
+            "underline": false,
+            "align": "center"
+          }
+        },
+        {
+          "type": "image",
+          "id": "image-1",
+          "src": "chemin/vers/image.jpg",
+          "position": {
+            "x": 150,
+            "y": 150,
+            "width": 300,
+            "height": 200
+          },
+          "alt": "Description de l'image"
+        },
+        {
+          "type": "shape",
+          "id": "shape-1",
+          "shapeType": "rectangle",
+          "position": {
+            "x": 100,
+            "y": 350,
+            "width": 150,
+            "height": 100
+          },
+          "style": {
+            "fill": "#E6F7FF",
+            "stroke": "#1890FF",
+            "strokeWidth": 2
+          },
+          "text": "Texte dans la forme"
+        }
+      ],
+      "background": {
+        "color": "#FFFFFF"
+      }
+    }
+  ],
+  "metadata": {
+    "author": "Auteur",
+    "created": "2023-01-01T12:00:00.000Z",
+    "modified": "2023-01-02T12:00:00.000Z",
+    "description": "Description de la présentation"
+  }
+}
+``` 
